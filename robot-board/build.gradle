@@ -22,7 +22,6 @@ dependencies {
 	implementation 'net.sf.robocode:robocode.api:1.11.2'
 	implementation 'net.sf.robocode:robocode.ui:1.11.2'
 	implementation 'net.sf.robocode:robocode.repository:1.11.2'
-	implementation files('../robocode/libs/javax.json-1.1.4.jar')
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
