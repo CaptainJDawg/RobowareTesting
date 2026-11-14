@@ -4,11 +4,7 @@ This program will be used to run engaging Robocode competitions. Flexible compet
 
 ## How to run
 
-Run commands from root directory
-
-EventDriver: `java -cp ".\robocode\libs\*" src/EventDriver.java`
-
-## (Proposed) Project Structure
+## Project Structure
 
 ```text
 ISE-CS4431-Robocode/
@@ -27,15 +23,12 @@ ISE-CS4431-Robocode/
 └── src/
     ├── main/
     │   ├── java/
-    │   │   └── com/Robocomp/
+    │   │   └── com/robo_board/robot_board/
     │   │       └── RobotBoardApplication.java
-    │   │       └── EventDriver.java
-    │   │       └── League.java
-    │   │       └── All other .java files
     │   └── resources/
     │       └── application.properties
     └── test/
         └── java/
-            └── com/Robocomp/
+            └── com/robo_board/robot_board/
                 └── RobotBoardApplicationTests.java
 ```

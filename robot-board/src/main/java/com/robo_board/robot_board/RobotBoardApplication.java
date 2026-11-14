@@ -21,4 +21,9 @@ public class RobotBoardApplication {
 
         SpringApplication.run(RobotBoardApplication.class, args);
     }
+
+    @GetMapping("/hello")
+    public String hello(@RequestParam(defaultValue = "World") String name) {
+        return String.format("nlnslj Hello %s!", name);
+    }
 }
