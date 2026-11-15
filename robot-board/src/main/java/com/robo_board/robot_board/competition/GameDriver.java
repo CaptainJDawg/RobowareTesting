@@ -1,3 +1,4 @@
+package com.robo_board.robot_board.competition;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -1,11 +1,14 @@
-import java.io.File;
+package com.robo_board.robot_board.competition;
+
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class CompetitionDriver {
 
-    private static final ArrayList<String> SAMPLE_ENTRANTS = new ArrayList<String>(List.of( 
+
+    public static final List<String> SAMPLE_ENTRANTS = List.of(
         "sample.Corners",
         "sample.Fire",
         "sample.SpinBot",
@@ -19,27 +22,18 @@ public class CompetitionDriver {
         "sample.TrackFire",
         "sample.VelociRobot"
         // "sample.VelociRobot"
-    ));
+    );
 
     private final int BROADCAST_COUNT = 4;
-    private final File robocodeHome;
     private final League leaguePhase;
 
-    public static void main(String[] args) {
-
-        CompetitionDriver myDriver = new CompetitionDriver(SAMPLE_ENTRANTS);
-
-        System.out.printf("Competition Over%n");
-    }
-
-    public CompetitionDriver(ArrayList<String> entrants) {
-        robocodeHome = new File("robocode");
-        leaguePhase = League.Generate(entrants, 4, 24); 
+    public CompetitionDriver(List<String> entrants, Path robocodeHome) {
+        leaguePhase = League.Generate(entrants, 4, 4); 
         List<RobocodeEngineRunner> runners = new ArrayList<>();
         int runnerId = 1;
         for (List<List<String>> batch : RobocodeEngineRunner.partitionSchedule(
                 leaguePhase.getSchedule(), BROADCAST_COUNT)) {
-            runners.add(new RobocodeEngineRunner(runnerId++, robocodeHome, batch));
+            runners.add(new RobocodeEngineRunner(runnerId++, robocodeHome.toFile(), batch));
         }
         RobocodeEngineRunner.runAll(runners, leaguePhase::recordBattleResults);
         leaguePhase.printStatsTable();

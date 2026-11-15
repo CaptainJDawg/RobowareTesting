@@ -1,3 +1,5 @@
+package com.robo_board.robot_board.competition;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,7 +32,7 @@ public class League {
     private ArrayList<ScheduledGame> games;
     private ArrayList<String> entrants;
 
-    public static League Generate(ArrayList<String> EntryNames, final int GAME_SIZE, final int GAME_COUNT_PER_ENTRY) {
+    public static League Generate(List<String> EntryNames, final int GAME_SIZE, final int GAME_COUNT_PER_ENTRY) {
         final int ENTRY_COUNT = EntryNames.size();
 
         League newLeague = new League();

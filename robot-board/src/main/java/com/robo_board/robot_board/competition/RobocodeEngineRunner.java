@@ -1,3 +1,5 @@
+package com.robo_board.robot_board.competition;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -26,7 +28,6 @@ import robocode.BattleResults;
 /** One child JVM and its fixed schedule. Static methods coordinate multiple runners. */
 public final class RobocodeEngineRunner {
     private static final Path LOG_DIRECTORY = Path.of("logs");
-    private static final Path GAME_DRIVER_SOURCE = Path.of("src", "GameDriver.java").toAbsolutePath();
 
     private final int id;
     private final File robocodeHome;
@@ -129,10 +130,19 @@ public final class RobocodeEngineRunner {
         String executable = System.getProperty("os.name").startsWith("Windows") ? "java.exe" : "java";
         process = new ProcessBuilder(
                 Path.of(System.getProperty("java.home"), "bin", executable).toString(),
-                "-cp", System.getProperty("java.class.path"), GAME_DRIVER_SOURCE.toString(),
+                "-cp", childClasspath(), GameDriver.class.getName(),
                 Integer.toString(id), robocodeHome.toString(), scheduleFile.toString())
                 .redirectErrorStream(true).start();
         return process;
+    }
+
+    /** Resolve Gradle's runtime dependencies to ordinary jar/class paths for the child JVM. */
+    private static String childClasspath() throws IOException {
+        String resolved = System.getProperty("competition.childClasspath");
+        if (resolved == null || resolved.isBlank()) {
+            resolved = System.getProperty("java.class.path");
+        }
+        return resolved;
     }
 
     private void execute(BlockingQueue<RunnerEvent> events) throws IOException, InterruptedException {

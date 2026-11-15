@@ -31,8 +31,7 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-tasks.register('runCompetition', JavaExec) {
-    classpath = sourceSets.main.runtimeClasspath
-    mainClass = 'com.robo_board.robot_board.competition_core.Competition'
-    workingDir = rootProject.projectDir.parentFile
+// Pass Gradle's resolved runtime dependencies to Robocode's child JVM.
+tasks.named('bootRun') {
+	systemProperty 'competition.childClasspath', sourceSets.main.runtimeClasspath.asPath
 }
