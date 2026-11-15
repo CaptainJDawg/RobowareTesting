@@ -32,6 +32,6 @@ public class CompetitionService {
         System.out.printf("Running competition... %n");
 
         new CompetitionDriver(CompetitionDriver.SAMPLE_ENTRANTS,
-                Path.of("..", "robocode").toAbsolutePath().normalize());
+                Path.of("robocode").toAbsolutePath().normalize());
     }
 }
