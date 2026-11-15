@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.robo_board.robot_board.competition.CompetitionService;
 
 @RestController
 @RequestMapping("/api")
@@ -16,16 +17,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class LeaderboardController {
 
     private final LeaderboardService leaderboardService;
+    private final CompetitionService competitionService;
     private final AtomicBoolean battleRunning = new AtomicBoolean(false);
 
-    public LeaderboardController(LeaderboardService leaderboardService) {
+    public LeaderboardController(LeaderboardService leaderboardService, CompetitionService competitionService) {
         this.leaderboardService = leaderboardService;
+        this.competitionService = competitionService;
     }
 
     // Spectators / Web page fetch the current rankings here
     @GetMapping("/leaderboard")
     public List<Map.Entry<String, Integer>> getLeaderboard() {
         return leaderboardService.getStandings();
+    }
+
+    @PostMapping("/competition/start")
+    public String startCompetition() {
+        if (!competitionService.startCompetition()) {
+            return "A competition is already running.";
+        }
+        return "Competition started.";
     }
 
     // You or the admin can start a game directly from an admin panel or curl
