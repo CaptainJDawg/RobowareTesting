@@ -4,6 +4,23 @@ This program will be used to run engaging Robocode competitions. Flexible compet
 
 ## How to run
 
+### macOS / Linux
+
+```
+./gradlew bootRun
+```
+
+### Windows
+
+Run these commands in PowerShell from the project root. Keep the application running and use a second terminal for the API commands.
+
+| Action | Command |
+| --- | --- |
+| Start the Spring Boot application | `.\gradlew.bat bootRun` |
+| Start a battle | `curl.exe -X POST "http://localhost:8080/api/battle/start"` |
+| View the current leaderboard | `curl.exe "http://localhost:8080/api/leaderboard"` |
+| Stop the application | Press `Ctrl+C` in the terminal running the application. |
+
 ## Project Structure
 
 ```text
@@ -32,3 +49,5 @@ ISE-CS4431-Robocode/
             └── com/robo_board/robot_board/
                 └── RobotBoardApplicationTests.java
 ```
+
+
