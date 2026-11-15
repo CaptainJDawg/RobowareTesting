@@ -35,7 +35,13 @@ public class CompetitionDriver {
     public CompetitionDriver(ArrayList<String> entrants) {
         robocodeHome = new File("robocode");
         leaguePhase = League.Generate(entrants, 4, 24); 
-        leaguePhase.start(BROADCAST_COUNT, robocodeHome);
+        List<RobocodeEngineRunner> runners = new ArrayList<>();
+        int runnerId = 1;
+        for (List<List<String>> batch : RobocodeEngineRunner.partitionSchedule(
+                leaguePhase.getSchedule(), BROADCAST_COUNT)) {
+            runners.add(new RobocodeEngineRunner(runnerId++, robocodeHome, batch));
+        }
+        RobocodeEngineRunner.runAll(runners, leaguePhase::recordBattleResults);
         leaguePhase.printStatsTable();
     }
 }

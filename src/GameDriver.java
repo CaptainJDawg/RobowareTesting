@@ -19,21 +19,12 @@ import robocode.control.events.BattleCompletedEvent;
 
 public class GameDriver {
 
-    private RobocodeEngine engine;
-    private List<List<String>> gameSchedule;
+    private final RobocodeEngine engine;
+    private final List<List<String>> gameSchedule;
+    private volatile boolean battleCompleted;
+    private volatile String battleError;
 
-
-    private static final String[] SAMPLE_BOTS = {
-        "sample.Corners",
-        "sample.Fire",
-        "sample.SpinBot",
-        "sample.SittingDuck"
-    };
-
-
-
-    //private static List<List<League.
-        private static String battleCompletedEventToJson(BattleCompletedEvent event) {
+    private static String battleCompletedEventToJson(BattleCompletedEvent event) {
         BattleRules rules = event.getBattleRules();
         JsonObject battleRules = Json.createObjectBuilder()
                 .add("battlefieldWidth", rules.getBattlefieldWidth())
@@ -78,104 +69,90 @@ public class GameDriver {
         return jsonResults;
     }
 
-    public static void main(String[] args) {// args: [id, robocodehome, schedule]
-        int gameId = Integer.parseInt(args[0]);
-        File robocodeHome = new File(args[1]);
-
-        System.out.println(args[2]);
-
-        if (!robocodeHome.isDirectory()) {
-            throw new IllegalStateException(
-                    "Robocode not found: " + robocodeHome.getAbsolutePath());
-        }
-
-        System.out.println("Starting game " + gameId);
-        new GameDriver(robocodeHome, parseSchedule(args[2]));
-        System.out.println("Game " + gameId + " finished");
-
-        System.exit(0);
-    }
-
-    private static List<List<String>> parseSchedule(String arg) {
-        String[] splitIntoGames = arg.split("\\]\\, \\[");
-        //List<List<String>> schedule = new ArrayList<>();
-
-        List<List<String>> parsedSchedule = new ArrayList<>();
-
-        for (String game: splitIntoGames) {
-            System.out.println(game);
-
-            String[] entrantIds = game.split(",");
-            List<String> parsedIds = new ArrayList<>();
-
-            for (String entrantId : entrantIds) {
-
-                if (entrantId.substring(0,2).equals("[["))
-                    entrantId = entrantId.substring(2);
-                if (entrantId.substring(entrantId.length()-2,entrantId.length()).equals("]]"))
-                    entrantId = entrantId.substring(0, entrantId.length()-2);
-
-                parsedIds.add(entrantId.trim());
+    /** Child JVM entry point: runner ID, Robocode home, JSON schedule file. */
+    public static void main(String[] args) {
+        int exitCode = 0;
+        try {
+            if (args.length != 3) {
+                throw new IllegalArgumentException("Expected runner ID, Robocode home and schedule file");
             }
-            parsedSchedule.add(parsedIds);
+            int runnerId = Integer.parseInt(args[0]);
+            File robocodeHome = new File(args[1]);
+            if (!robocodeHome.isDirectory()) {
+                throw new IllegalStateException("Robocode not found: " + robocodeHome.getAbsolutePath());
+            }
+            System.out.println("Starting runner " + runnerId);
+            new GameDriver(robocodeHome, parseSchedule(java.nio.file.Path.of(args[2])));
+            System.out.println("Runner " + runnerId + " finished");
+        } catch (Exception failure) {
+            failure.printStackTrace(System.err);
+            exitCode = 1;
         }
-        return  parsedSchedule;
+        // Robocode's GUI threads can outlive engine.close().
+        System.exit(exitCode);
     }
 
-    private enum GameDriverState {
-        READY,
-        RUNNING,
-        OVER
+    private static List<List<String>> parseSchedule(java.nio.file.Path path) throws java.io.IOException {
+        try (java.io.Reader input = java.nio.file.Files.newBufferedReader(path,
+                java.nio.charset.StandardCharsets.UTF_8);
+                javax.json.JsonReader reader = Json.createReader(input)) {
+            List<List<String>> schedule = new ArrayList<>();
+            for (javax.json.JsonArray game : reader.readArray().getValuesAs(javax.json.JsonArray.class)) {
+                List<String> robots = new ArrayList<>();
+                for (javax.json.JsonString robot : game.getValuesAs(javax.json.JsonString.class)) {
+                    robots.add(robot.getString());
+                }
+                if (robots.isEmpty()) {
+                    throw new IllegalArgumentException("A scheduled battle cannot be empty");
+                }
+                schedule.add(List.copyOf(robots));
+            }
+            return List.copyOf(schedule);
+        }
     }
-
-
 
     public GameDriver(File robocodeHome, List<List<String>> gameSchedule) {
+        this.gameSchedule = gameSchedule.stream().map(List::copyOf).toList();
         engine = new RobocodeEngine(robocodeHome);
-        this.gameSchedule = gameSchedule;
-        //System.out.println("hello world");
-        //System.out.println(gameSchedule);
+        try {
+            engine.setVisible(true);
+            engine.addBattleListener(new BattleAdaptor() {
+                @Override
+                public void onBattleCompleted(BattleCompletedEvent event) {
+                    System.out.println(battleCompletedEventToJson(event));
+                    System.out.flush();
+                    battleCompleted = true;
+                }
 
-        engine.setVisible(true);
-        engine.addBattleListener(new BattleAdaptor() {
-            @Override
-            public void onBattleCompleted(BattleCompletedEvent event) {
-                System.out.println(battleCompletedEventToJson(event));
+                @Override
+                public void onBattleError(robocode.control.events.BattleErrorEvent event) {
+                    battleError = event.getError();
+                    System.err.println("Battle error: " + battleError);
+                }
+            });
+            for (int i = 0; i < this.gameSchedule.size(); i++) {
+                runGame(i);
             }
-
-            @Override
-            public void onBattleError(
-                    robocode.control.events.BattleErrorEvent event) {
-                System.err.println("Battle error: " + event.getError());
-            }
-        });
-
-        for (int i = 0; i < gameSchedule.size(); i++)
-            runGame(i);
-
-        engine.close();
+        } finally {
+            engine.close();
+        }
     }
 
     public void runGame(int gameIndex) {
-        try {
-
-            RobotSpecification[] robots =
-                    engine.getLocalRepository(String.join(",", gameSchedule.get(gameIndex)));
-
-            BattleSpecification battle = new BattleSpecification(
-                    1,
-                    new BattlefieldSpecification(800, 600),
-                    robots);
-
-            engine.runBattle(battle);
-            engine.waitTillBattleOver();
-
-        } catch (Exception err) {
-            System.out.println(err);
-        } finally {
-            
+        battleCompleted = false;
+        battleError = null;
+        List<String> scheduledRobots = gameSchedule.get(gameIndex);
+        RobotSpecification[] robots = engine.getLocalRepository(String.join(",", scheduledRobots));
+        if (robots.length != scheduledRobots.size()) {
+            throw new IllegalStateException("Could not resolve all robots for battle " + gameIndex);
+        }
+        BattleSpecification battle = new BattleSpecification(
+                1, new BattlefieldSpecification(800, 600), robots);
+        engine.runBattle(battle);
+        engine.waitTillBattleOver();
+        if (battleError != null || !battleCompleted) {
+            throw new IllegalStateException("Battle " + gameIndex + " failed: "
+                    + (battleError == null ? "No completion event received" : battleError));
         }
     }
-
-
 }
