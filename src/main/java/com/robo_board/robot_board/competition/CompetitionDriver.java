@@ -24,11 +24,11 @@ public class CompetitionDriver {
         // "sample.VelociRobot"
     );
 
-    private final int BROADCAST_COUNT = 4;
+    private final int BROADCAST_COUNT = 1;
     private final League leaguePhase;
 
     public CompetitionDriver(List<String> entrants, Path robocodeHome) {
-        leaguePhase = League.Generate(entrants, 4, 4); 
+        leaguePhase = League.Generate(entrants, 4, 1); 
         List<RobocodeEngineRunner> runners = new ArrayList<>();
         int runnerId = 1;
         for (List<List<String>> batch : RobocodeEngineRunner.partitionSchedule(
