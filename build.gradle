@@ -22,10 +22,16 @@ dependencies {
 	implementation 'net.sf.robocode:robocode.api:1.11.2'
 	implementation 'net.sf.robocode:robocode.ui:1.11.2'
 	implementation 'net.sf.robocode:robocode.repository:1.11.2'
+	implementation 'org.glassfish:javax.json:1.1.4'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// Pass Gradle's resolved runtime dependencies to Robocode's child JVM.
+tasks.named('bootRun') {
+	systemProperty 'competition.childClasspath', sourceSets.main.runtimeClasspath.asPath
 }

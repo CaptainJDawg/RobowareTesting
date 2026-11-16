@@ -21,8 +21,6 @@ Run these commands in PowerShell from the project root. Keep the application run
 | View the current leaderboard | `curl.exe "http://localhost:8080/api/leaderboard"` |
 | Stop the application | Press `Ctrl+C` in the terminal running the application. |
 
-
-
 ## Project Structure
 
 ```text
