@@ -24,30 +24,25 @@ Run these commands in PowerShell from the project root. Keep the application run
 ## Project Structure
 
 ```text
-ISE-CS4431-Robocode/
 ├── README.md
-├── rules.md
+├── SentryBot.java
 ├── build.gradle
-├── settings.gradle
+├── gradle/wrapper
+│--- ├── gradle-wrapper.jar
+│--- └── gradle-wrapper.properties
 ├── gradlew
 ├── gradlew.bat
-├── .gitignore
-├── .gitattributes
-├── gradle/
-│   └── wrapper/
-│       ├── gradle-wrapper.jar
-│       └── gradle-wrapper.properties
-└── src/
-    ├── main/
-    │   ├── java/
-    │   │   └── com/robo_board/robot_board/
-    │   │       └── RobotBoardApplication.java
-    │   └── resources/
-    │       └── application.properties
-    └── test/
-        └── java/
-            └── com/robo_board/robot_board/
-                └── RobotBoardApplicationTests.java
+├── robocode
+├── rules.md
+├── settings.gradle
+└── src
+    ├── main
+    │--- ├── java/com..
+    │--- └── resources
+    │---     ├── application.properties
+    │---     ├── static
+    │---     └── templates
+    └── test/java/com..
 ```
 
-
+**`robocode`** is the Robocode repo.
