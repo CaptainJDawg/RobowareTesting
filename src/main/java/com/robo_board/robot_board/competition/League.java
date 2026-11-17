@@ -6,6 +6,11 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.List;
 
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+
 import robocode.BattleResults;
 
 
@@ -228,6 +233,44 @@ public class League {
         return List.copyOf(schedule);
     }
 
+    /** Returns an object containing the games, optionally including each game's battleRules. */
+    public JsonObject getScheduleJson(boolean includeBattleRules) {
+        JsonArrayBuilder schedule = Json.createArrayBuilder();
+        for (ScheduledBattle game : games) {
+            JsonObjectBuilder battle = Json.createObjectBuilder(game.toJsonObject());
+            if (!includeBattleRules) {
+                battle.remove("battleRules");
+            }
+            schedule.add(battle);
+        }
+        return Json.createObjectBuilder().add("games", schedule).build();
+    }
+
+    /** Encodes all instance state, using entry indices to identify battle participants. */
+    public JsonObject toJsonObject() {
+        JsonArrayBuilder entrants = Json.createArrayBuilder();
+        entries.forEach(entry -> entrants.add(entry.toJsonObject()));
+
+        JsonArrayBuilder battles = Json.createArrayBuilder();
+        for (ScheduledBattle game : games) {
+            JsonArrayBuilder participantIndices = Json.createArrayBuilder();
+            game.participants().forEach(entry -> participantIndices.add(entry.getIndex()));
+            battles.add(Json.createObjectBuilder(game.toJsonObject())
+                    .add("participantIndices", participantIndices));
+        }
+
+        return Json.createObjectBuilder()
+                .add("entries", entrants)
+                .add("games", battles)
+                .add("battleSettings", Json.createObjectBuilder(battleSettings.toJsonObject())
+                        .add("visible", battleSettings.visible()))
+                .build();
+    }
+
+    public String toJson() {
+        return toJsonObject().toString();
+    }
+
     /** Called by the competition driver once for each completed battle. */
     public void recordBattleResults(List<BattleResults> results) {
         for (BattleResults result : results) {
@@ -308,6 +351,36 @@ class Entry {
 
     public String toString() {
         return Integer.toString(index);
+    }
+
+    public JsonObject toJsonObject() {
+        return Json.createObjectBuilder()
+                .add("id", id)
+                .add("index", index)
+                .add("gamesScheduled", gamesScheduled)
+                .add("stats", statsToJsonObject())
+                .build();
+    }
+
+    public String toJson() {
+        return toJsonObject().toString();
+    }
+
+    private JsonObject statsToJsonObject() {
+        return Json.createObjectBuilder()
+                .add("teamLeaderName", stats.getTeamLeaderName())
+                .add("rank", stats.getRank())
+                .add("score", stats.getScore())
+                .add("survival", stats.getSurvival())
+                .add("lastSurvivorBonus", stats.getLastSurvivorBonus())
+                .add("bulletDamage", stats.getBulletDamage())
+                .add("bulletDamageBonus", stats.getBulletDamageBonus())
+                .add("ramDamage", stats.getRamDamage())
+                .add("ramDamageBonus", stats.getRamDamageBonus())
+                .add("firsts", stats.getFirsts())
+                .add("seconds", stats.getSeconds())
+                .add("thirds", stats.getThirds())
+                .build();
     }
 
     public void showInfo() {

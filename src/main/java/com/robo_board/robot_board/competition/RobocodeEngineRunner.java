@@ -168,7 +168,7 @@ public final class RobocodeEngineRunner {
             }
 
             String scheduleFileContents = games.build().toString();
-            System.out.printf("Schedule File: %s %n", scheduleFileContents);
+            //System.out.printf("Schedule File: %s %n", scheduleFileContents);
 
             Files.writeString(scheduleFile, scheduleFileContents, StandardCharsets.UTF_8);
             Process child = launch(scheduleFile);

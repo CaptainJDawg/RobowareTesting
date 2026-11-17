@@ -168,7 +168,7 @@ public final class ScheduledBattle {
     public record Settings(int numRounds, int battlefieldWidth, int battlefieldHeight,
             long inactivityTime, double gunCoolingRate, int sentryBorderSize,
             boolean hideEnemyNames, boolean visible) {
-        public static final Settings DEFAULT = new Settings(1, 1000, 1000, 450, 0.1, 100, false, true);
+        public static final Settings DEFAULT = new Settings(1, 1000, 1000, 450, 0.1, 200, false, true);
 
         public Settings {
             if (numRounds < 1 || battlefieldWidth < 400 || battlefieldWidth > 5000

@@ -50,6 +50,8 @@ public class CompetitionDriver {
         }
         RobocodeEngineRunner.runAll(runners, leaguePhase::recordBattleResults);
 
+        System.out.println(leaguePhase.toJson());
+
         if (PRINT_LEAGUE_RESULTS) leaguePhase.showStatsTable();
     }
 }
