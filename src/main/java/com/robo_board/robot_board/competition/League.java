@@ -31,6 +31,7 @@ public class League {
         "sample.VelociRobot",
         "sample.VelociRobot"
     ));
+    
     private ArrayList<Entry> entries;
     private ArrayList<ScheduledBattle> games;
 
@@ -120,7 +121,7 @@ public class League {
                     // constructed. The following logic is used to progressively loosen the restrictions
 
                     // System.out.println("Exhausted Entry Pool ");
-                    System.out.printf("Entry Pool: %s%n", onlyEntriesWithLowestGames);
+                    // System.out.printf("Entry Pool: %s%n", onlyEntriesWithLowestGames);
                     // System.out.printf("Lowest Game Count: %d%n", getLowestGameCount(newLeague.entries));
 
                     if (onlyEntriesWithLowestGames.size() < GAME_SIZE && targetScheduledCount != GAME_COUNT_PER_ENTRY) {

@@ -33,9 +33,7 @@ public class LeaderboardController {
 
     @PostMapping("/competition/start")
     public String startCompetition() {
-        if (!competitionService.startCompetition()) {
-            return "A competition is already running.";
-        }
+        competitionService.runCompetition();
         return "Competition started.";
     }
 
