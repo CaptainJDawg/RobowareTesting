@@ -1,10 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="/css/styles.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Player Rankings</title>
+	<link rel="stylesheet" href="styles/table.css">
 </head>
 <body>
-    <h1>Hello Spring Boot</h1>
-    <script defer src="scripts/recieve-events.js"></script>
+	<main class="container">
+		<table class="demo-table">
+			<thead>
+				<tr>
+					<th>Placement</th>
+					<th>Player</th>
+					<th>Robot</th>
+					<th>Points</th>
+				</tr>
+			</thead>
+			<tbody id="player-ids">
+			</tbody>
+		</table>
+	</main>
+    
+	<script  defer src="scripts/ranking.js"></script>
+  <script defer src="scripts/recieve-events.js"></script>
+	
 </body>
 </html>
