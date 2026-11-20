@@ -65,12 +65,12 @@ body {
 	background-color: #d12c2c;
 }
 
-.profile {
+.playerProfile {
 	display: flex;
 	align-items: center;
 }
 
-.profile .title {
+.playerProfile .title {
 	font-weight: 700;
 	font-size: 16px;
 	margin-bottom: 5px;

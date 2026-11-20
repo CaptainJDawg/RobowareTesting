@@ -87,15 +87,15 @@ function renderPlayers() {
 		// Use the placement set by the sort function.
 		row.append(createCell(String(player.placement)));
 
-		// Create the player name cell using the profile styles.
+		// Create the player name cell using the playerProfile styles.
 		const playerCell = document.createElement("td");
-		const profile = document.createElement("div");
-		profile.className = "profile";
+		const playerProfile = document.createElement("div");
+		playerProfile.className = "playerProfile";
 		const name = document.createElement("div");
 		name.className = "title";
 		name.textContent = player.player;
-		profile.append(name);
-		playerCell.append(profile);
+		playerProfile.append(name);
+		playerCell.append(playerProfile);
 		row.append(playerCell, createCell(player.bot));
 
 		const pointsCell = document.createElement("td");
@@ -106,6 +106,7 @@ function renderPlayers() {
 		row.append(pointsCell);
 		return row;
 	});
+	
 	playerRows.replaceChildren(...rows);
 
 	if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
