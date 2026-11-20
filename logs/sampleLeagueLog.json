@@ -1,0 +1,304 @@
+{
+  "entries": [
+    {
+      "id": "sample.Corners",
+      "index": 0,
+      "gamesScheduled": 1,
+      "stats": {
+        "teamLeaderName": "sample.Corners",
+        "rank": 0,
+        "score": 32,
+        "survival": 0,
+        "lastSurvivorBonus": 0,
+        "bulletDamage": 32,
+        "bulletDamageBonus": 0,
+        "ramDamage": 0,
+        "ramDamageBonus": 0,
+        "firsts": 0,
+        "seconds": 0,
+        "thirds": 0
+      }
+    },
+    {
+      "id": "sample.Fire",
+      "index": 1,
+      "gamesScheduled": 1,
+      "stats": {
+        "teamLeaderName": "sample.Fire",
+        "rank": 0,
+        "score": 139,
+        "survival": 50,
+        "lastSurvivorBonus": 0,
+        "bulletDamage": 76,
+        "bulletDamageBonus": 13,
+        "ramDamage": 0,
+        "ramDamageBonus": 0,
+        "firsts": 0,
+        "seconds": 0,
+        "thirds": 1
+      }
+    },
+    {
+      "id": "sample.SpinBot",
+      "index": 2,
+      "gamesScheduled": 1,
+      "stats": {
+        "teamLeaderName": "sample.SpinBot",
+        "rank": 0,
+        "score": 408,
+        "survival": 150,
+        "lastSurvivorBonus": 30,
+        "bulletDamage": 212,
+        "bulletDamageBonus": 14,
+        "ramDamage": 2,
+        "ramDamageBonus": 0,
+        "firsts": 1,
+        "seconds": 0,
+        "thirds": 0
+      }
+    },
+    {
+      "id": "sample.SittingDuck",
+      "index": 3,
+      "gamesScheduled": 1,
+      "stats": {
+        "teamLeaderName": "sample.SittingDuck",
+        "rank": 0,
+        "score": 0,
+        "survival": 0,
+        "lastSurvivorBonus": 0,
+        "bulletDamage": 0,
+        "bulletDamageBonus": 0,
+        "ramDamage": 0,
+        "ramDamageBonus": 0,
+        "firsts": 0,
+        "seconds": 0,
+        "thirds": 0
+      }
+    },
+    {
+      "id": "sample.Crazy",
+      "index": 4,
+      "gamesScheduled": 1,
+      "stats": {
+        "teamLeaderName": "sample.Crazy",
+        "rank": 0,
+        "score": 164,
+        "survival": 100,
+        "lastSurvivorBonus": 0,
+        "bulletDamage": 59,
+        "bulletDamageBonus": 2,
+        "ramDamage": 2,
+        "ramDamageBonus": 0,
+        "firsts": 0,
+        "seconds": 1,
+        "thirds": 0
+      }
+    },
+    {
+      "id": "sample.MyFirstRobot",
+      "index": 5,
+      "gamesScheduled": 1,
+      "stats": {
+        "teamLeaderName": "sample.MyFirstRobot",
+        "rank": 0,
+        "score": 1,
+        "survival": 0,
+        "lastSurvivorBonus": 0,
+        "bulletDamage": 0,
+        "bulletDamageBonus": 0,
+        "ramDamage": 1,
+        "ramDamageBonus": 0,
+        "firsts": 0,
+        "seconds": 0,
+        "thirds": 0
+      }
+    },
+    {
+      "id": "sample.PaintingRobot",
+      "index": 6,
+      "gamesScheduled": 1,
+      "stats": {
+        "teamLeaderName": "sample.PaintingRobot",
+        "rank": 0,
+        "score": 169,
+        "survival": 100,
+        "lastSurvivorBonus": 0,
+        "bulletDamage": 68,
+        "bulletDamageBonus": 0,
+        "ramDamage": 1,
+        "ramDamageBonus": 0,
+        "firsts": 0,
+        "seconds": 1,
+        "thirds": 0
+      }
+    },
+    {
+      "id": "sample.RamFire",
+      "index": 7,
+      "gamesScheduled": 1,
+      "stats": {
+        "teamLeaderName": "sample.RamFire",
+        "rank": 0,
+        "score": 233,
+        "survival": 50,
+        "lastSurvivorBonus": 0,
+        "bulletDamage": 148,
+        "bulletDamageBonus": 0,
+        "ramDamage": 35,
+        "ramDamageBonus": 0,
+        "firsts": 0,
+        "seconds": 0,
+        "thirds": 1
+      }
+    },
+    {
+      "id": "sample.Tracker",
+      "index": 8,
+      "gamesScheduled": 1,
+      "stats": {
+        "teamLeaderName": "sample.Tracker",
+        "rank": 0,
+        "score": 461,
+        "survival": 150,
+        "lastSurvivorBonus": 30,
+        "bulletDamage": 234,
+        "bulletDamageBonus": 47,
+        "ramDamage": 0,
+        "ramDamageBonus": 0,
+        "firsts": 1,
+        "seconds": 0,
+        "thirds": 0
+      }
+    },
+    {
+      "id": "sample.Target",
+      "index": 9,
+      "gamesScheduled": 1,
+      "stats": {
+        "teamLeaderName": "sample.Target",
+        "rank": 0,
+        "score": 50,
+        "survival": 50,
+        "lastSurvivorBonus": 0,
+        "bulletDamage": 0,
+        "bulletDamageBonus": 0,
+        "ramDamage": 0,
+        "ramDamageBonus": 0,
+        "firsts": 0,
+        "seconds": 0,
+        "thirds": 1
+      }
+    },
+    {
+      "id": "sample.TrackFire",
+      "index": 10,
+      "gamesScheduled": 1,
+      "stats": {
+        "teamLeaderName": "sample.TrackFire",
+        "rank": 0,
+        "score": 502,
+        "survival": 150,
+        "lastSurvivorBonus": 30,
+        "bulletDamage": 268,
+        "bulletDamageBonus": 54,
+        "ramDamage": 0,
+        "ramDamageBonus": 0,
+        "firsts": 1,
+        "seconds": 0,
+        "thirds": 0
+      }
+    },
+    {
+      "id": "sample.VelociRobot",
+      "index": 11,
+      "gamesScheduled": 1,
+      "stats": {
+        "teamLeaderName": "sample.VelociRobot",
+        "rank": 0,
+        "score": 168,
+        "survival": 100,
+        "lastSurvivorBonus": 0,
+        "bulletDamage": 68,
+        "bulletDamageBonus": 0,
+        "ramDamage": 0,
+        "ramDamageBonus": 0,
+        "firsts": 0,
+        "seconds": 1,
+        "thirds": 0
+      }
+    }
+  ],
+  "games": [
+    {
+      "entries": [
+        "sample.Fire",
+        "sample.SpinBot",
+        "sample.SittingDuck",
+        "sample.Crazy"
+      ],
+      "battleRules": {
+        "numRounds": 1,
+        "battlefieldWidth": 1000,
+        "battlefieldHeight": 1000,
+        "inactivityTime": 450,
+        "gunCoolingRate": 0.1,
+        "sentryBorderSize": 200,
+        "hideEnemyNames": false
+      },
+      "visible": true,
+      "initialSetups": [],
+      "participantIndices": [1, 2, 3, 4]
+    },
+    {
+      "entries": [
+        "sample.Target",
+        "sample.TrackFire",
+        "sample.VelociRobot",
+        "sample.Corners"
+      ],
+      "battleRules": {
+        "numRounds": 1,
+        "battlefieldWidth": 1000,
+        "battlefieldHeight": 1000,
+        "inactivityTime": 450,
+        "gunCoolingRate": 0.1,
+        "sentryBorderSize": 200,
+        "hideEnemyNames": false
+      },
+      "visible": true,
+      "initialSetups": [],
+      "participantIndices": [9, 10, 11, 0]
+    },
+    {
+      "entries": [
+        "sample.MyFirstRobot",
+        "sample.PaintingRobot",
+        "sample.RamFire",
+        "sample.Tracker"
+      ],
+      "battleRules": {
+        "numRounds": 1,
+        "battlefieldWidth": 1000,
+        "battlefieldHeight": 1000,
+        "inactivityTime": 450,
+        "gunCoolingRate": 0.1,
+        "sentryBorderSize": 200,
+        "hideEnemyNames": false
+      },
+      "visible": true,
+      "initialSetups": [],
+      "participantIndices": [5, 6, 7, 8]
+    }
+  ],
+  "battleSettings": {
+    "numRounds": 1,
+    "battlefieldWidth": 1000,
+    "battlefieldHeight": 1000,
+    "inactivityTime": 450,
+    "gunCoolingRate": 0.1,
+    "sentryBorderSize": 200,
+    "hideEnemyNames": false,
+    "visible": true
+  }
+}
