@@ -24,18 +24,34 @@ public class CompetitionDriver {
         // "sample.VelociRobot"
     );
 
-    private final int BROADCAST_COUNT = 1;
+    private final int BROADCAST_COUNT = 1; // how many robocode instances to run in parrallel that 'broadcast' the competition to to the audience
+
+    private final boolean PRINT_LEAGUE_SCHEDULE = true; 
+    private final boolean PRINT_LEAGUE_RESULTS = true; 
+    private final int LEAGUE_GAMES_PER_ENTRY = 1; // how many games should each entry play in the league. The higher this is the more chance of a player to play an opponent more than once 
+    private final int LEAGUE_GAME_SIZE = 4; // specifies 1v1v1v1 or 4-person-ffa. Make this 2 and the league runs on 1v1s
     private final League leaguePhase;
 
     public CompetitionDriver(List<String> entrants, Path robocodeHome) {
-        leaguePhase = League.Generate(entrants, 4, 1); 
+        this(entrants, robocodeHome, ScheduledBattle.Settings.DEFAULT);
+    }
+
+    public CompetitionDriver(List<String> entrants, Path robocodeHome, ScheduledBattle.Settings settings) {
+        leaguePhase = League.Generate(entrants, LEAGUE_GAME_SIZE, LEAGUE_GAMES_PER_ENTRY, settings);
+
+        if (PRINT_LEAGUE_SCHEDULE) leaguePhase.showSchedule();
+
         List<RobocodeEngineRunner> runners = new ArrayList<>();
         int runnerId = 1;
-        for (List<List<String>> batch : RobocodeEngineRunner.partitionSchedule(
-                leaguePhase.getSchedule(), BROADCAST_COUNT)) {
+
+        for (List<ScheduledBattle> batch : RobocodeEngineRunner.partitionBattles(
+                leaguePhase.getScheduledBattles(), BROADCAST_COUNT)) {
             runners.add(new RobocodeEngineRunner(runnerId++, robocodeHome.toFile(), batch));
         }
         RobocodeEngineRunner.runAll(runners, leaguePhase::recordBattleResults);
-        leaguePhase.printStatsTable();
+
+        System.out.println(leaguePhase.toJson());
+
+        if (PRINT_LEAGUE_RESULTS) leaguePhase.showStatsTable();
     }
 }
