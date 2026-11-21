@@ -17,8 +17,8 @@ Run these commands in PowerShell from the project root. Keep the application run
 | Action | Command |
 | --- | --- |
 | Start the Spring Boot application | `.\gradlew.bat bootRun` |
-| Start a battle | `curl.exe -X POST "http://localhost:8080/api/battle/start"` |
-| View the current leaderboard | `curl.exe "http://localhost:8080/api/leaderboard"` |
+| Start a battle | `curl.exe -X POST "http://localhost:8080/api/competition/start"` |
+| View the current leaderboard | `curl.exe "http://localhost:8080/"` |
 | Stop the application | Press `Ctrl+C` in the terminal running the application. |
 
 ## Project Structure
