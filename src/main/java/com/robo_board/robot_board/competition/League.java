@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.List;
-import java.lang.IllegalArgumentException;
-import java.lang.IndexOutOfBoundsException;
+
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 import robocode.BattleResults;
 
@@ -28,15 +31,20 @@ public class League {
         "sample.VelociRobot",
         "sample.VelociRobot"
     ));
+    
     private ArrayList<Entry> entries;
-    private ArrayList<ScheduledGame> games;
-    private ArrayList<String> entrants;
+    private ArrayList<ScheduledBattle> games;
 
     public static League Generate(List<String> EntryNames, final int GAME_SIZE, final int GAME_COUNT_PER_ENTRY) {
+        return Generate(EntryNames, GAME_SIZE, GAME_COUNT_PER_ENTRY, ScheduledBattle.Settings.DEFAULT);
+    }
+
+    public static League Generate(List<String> EntryNames, final int GAME_SIZE, final int GAME_COUNT_PER_ENTRY,
+            ScheduledBattle.Settings settings) {
         final int ENTRY_COUNT = EntryNames.size();
 
         League newLeague = new League();
-        newLeague.entrants = new ArrayList<>(EntryNames);
+        newLeague.battleSettings = java.util.Objects.requireNonNull(settings);
         Random random = new Random();
 
         for (int i = 0; i < ENTRY_COUNT; i++) {
@@ -113,7 +121,7 @@ public class League {
                     // constructed. The following logic is used to progressively loosen the restrictions
 
                     // System.out.println("Exhausted Entry Pool ");
-                    System.out.printf("Entry Pool: %s%n", onlyEntriesWithLowestGames);
+                    // System.out.printf("Entry Pool: %s%n", onlyEntriesWithLowestGames);
                     // System.out.printf("Lowest Game Count: %d%n", getLowestGameCount(newLeague.entries));
 
                     if (onlyEntriesWithLowestGames.size() < GAME_SIZE && targetScheduledCount != GAME_COUNT_PER_ENTRY) {
@@ -152,7 +160,10 @@ public class League {
                                 System.out.println(newLeague.games.size() + nextGame.size() + 1 - GAME_SIZE);
                                 for (int j = newLeague.games.size() + nextGame.size() + 1 - GAME_SIZE; j < newLeague.games.size(); j++) {
                                     System.out.println(j);
-                                    Entry entry = newLeague.games.get(j).entries.remove(0);
+                                    ScheduledBattle previousGame = newLeague.games.get(j);
+                                    ArrayList<Entry> remainingEntries = new ArrayList<>(previousGame.participants());
+                                    Entry entry = remainingEntries.remove(0);
+                                    newLeague.games.set(j, new ScheduledBattle(remainingEntries, previousGame.settings()));
                                     nextGame.add(entry);
                                 }
                             }
@@ -206,16 +217,59 @@ public class League {
     public League() {
         entries = new ArrayList<>();
         games =  new ArrayList<>();
-        entrants = new ArrayList<>();
     }
 
-    /** Immutable robot-name schedule; contains no process or JVM information. */
+    private ScheduledBattle.Settings battleSettings = ScheduledBattle.Settings.DEFAULT;
+
+    public List<ScheduledBattle> getScheduledBattles() {
+        return List.copyOf(games);
+    }
+
+    /** Immutable robot-name schedule for callers that only need the matchups. */
     public List<List<String>> getSchedule() {
         List<List<String>> schedule = new ArrayList<>();
-        for (ScheduledGame game : games) {
-            schedule.add(List.copyOf(ScheduledGame.insertRobotIds(game, entrants)));
+        for (ScheduledBattle game : games) {
+            schedule.add(game.entries());
         }
         return List.copyOf(schedule);
+    }
+
+    /** Returns an object containing the games, optionally including each game's battleRules. */
+    public JsonObject getScheduleJson(boolean includeBattleRules) {
+        JsonArrayBuilder schedule = Json.createArrayBuilder();
+        for (ScheduledBattle game : games) {
+            JsonObjectBuilder battle = Json.createObjectBuilder(game.toJsonObject());
+            if (!includeBattleRules) {
+                battle.remove("battleRules");
+            }
+            schedule.add(battle);
+        }
+        return Json.createObjectBuilder().add("games", schedule).build();
+    }
+
+    /** Encodes all instance state, using entry indices to identify battle participants. */
+    public JsonObject toJsonObject() {
+        JsonArrayBuilder entrants = Json.createArrayBuilder();
+        entries.forEach(entry -> entrants.add(entry.toJsonObject()));
+
+        JsonArrayBuilder battles = Json.createArrayBuilder();
+        for (ScheduledBattle game : games) {
+            JsonArrayBuilder participantIndices = Json.createArrayBuilder();
+            game.participants().forEach(entry -> participantIndices.add(entry.getIndex()));
+            battles.add(Json.createObjectBuilder(game.toJsonObject())
+                    .add("participantIndices", participantIndices));
+        }
+
+        return Json.createObjectBuilder()
+                .add("entries", entrants)
+                .add("games", battles)
+                .add("battleSettings", Json.createObjectBuilder(battleSettings.toJsonObject())
+                        .add("visible", battleSettings.visible()))
+                .build();
+    }
+
+    public String toJson() {
+        return toJsonObject().toString();
     }
 
     /** Called by the competition driver once for each completed battle. */
@@ -230,15 +284,15 @@ public class League {
         for (Entry entry : entries) {
             if (entry.id.equals(results.getTeamLeaderName())) {
                 entry.aggregateStats(results);
-                entry.showStats();
+                //entry.showStats();
                 break;
             }
         }
     }
 
     private void scheduleGame(List<Entry> entries) {
-        games.add(new ScheduledGame(entries));
-        System.out.printf("Scheduling game: %s%n", entries);
+        games.add(new ScheduledBattle(entries, battleSettings));
+        //System.out.printf("Scheduling game: %s%n", entries);
     }
 
     private int getGameCount() {
@@ -251,7 +305,7 @@ public class League {
        }
     }
 
-    public void printStatsTable() {
+    public void showStatsTable() {
         List<Entry> sortedEntries = new ArrayList<>(entries);
         sortedEntries.sort((first, second) -> Integer.compare(
                 second.getStats().getScore(),
@@ -277,70 +331,6 @@ public class League {
   
 }
 
-class ScheduledGame {
-
-    public static int ScheduledGameCount = 0;
-
-    public ArrayList<Entry> entries;
-
-    public ScheduledGame(List<Entry> entries) {
-
-
-        ScheduledGameCount++;
-        this.entries = new ArrayList<>();
-        this.entries.addAll(entries);
-
-        //if (entries.size() != League.GAME_SIZE) System.out.printf("Bad game generated: %s%n",this);
-    }
-
-    public String toString() {
-        return entries.toString();
-    }
-
-    public static void PrintSchedule(ArrayList<ScheduledGame> games) {
-        for (int i = 0; i < games.size(); i++) {
-            System.out.printf("%d: %s%n", i, games.get(i));
-        }
-    }
-
-    public static void ShowCollisions(ArrayList<ScheduledGame> games, ArrayList<Entry> entries) {
-        for (Entry entry : entries) {
-            // how many times each opponent shows up in my matches
-            HashMap<Entry, Integer> opponentsCount = new HashMap<>();
-
-            for (Entry opponent : entry.findPastOpponents(games)) {
-                opponentsCount.put(opponent, 0);
-                for (ScheduledGame game : entry.findMyGames(games)) {
-                    if (game.entries.contains(opponent)) {
-                        opponentsCount.put(opponent, opponentsCount.get(opponent) + 1);
-                    }
-                }
-            }
-
-            if (opponentsCount.values().contains(2)) {
-                System.out.printf("Opponent Count for entry %s:%n", entry);
-                for (Entry opponent : opponentsCount.keySet()) {
-                    System.out.printf("\t%s: %d%n", opponent, opponentsCount.get(opponent));
-                }
-            }
-        }
-    }
-
-    public static List<String> insertRobotIds(ScheduledGame game, List<String> entrants) {
-        List<String> robots = new ArrayList<>();
-        for (Entry entry : game.entries) {
-            try {
-                robots.add(entrants.get(entry.getIndex()));
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Entry %s in game does not have integer id");
-            } catch (IndexOutOfBoundsException e) {
-                throw new IllegalArgumentException("Entry %s in game has integer id not covered in list of entries");
-            } 
-        }
-        return robots;
-    }
-}
-
 class Entry {
 
 
@@ -364,24 +354,54 @@ class Entry {
         return Integer.toString(index);
     }
 
+    public JsonObject toJsonObject() {
+        return Json.createObjectBuilder()
+                .add("id", id)
+                .add("index", index)
+                .add("gamesScheduled", gamesScheduled)
+                .add("stats", statsToJsonObject())
+                .build();
+    }
+
+    public String toJson() {
+        return toJsonObject().toString();
+    }
+
+    private JsonObject statsToJsonObject() {
+        return Json.createObjectBuilder()
+                .add("teamLeaderName", stats.getTeamLeaderName())
+                .add("rank", stats.getRank())
+                .add("score", stats.getScore())
+                .add("survival", stats.getSurvival())
+                .add("lastSurvivorBonus", stats.getLastSurvivorBonus())
+                .add("bulletDamage", stats.getBulletDamage())
+                .add("bulletDamageBonus", stats.getBulletDamageBonus())
+                .add("ramDamage", stats.getRamDamage())
+                .add("ramDamageBonus", stats.getRamDamageBonus())
+                .add("firsts", stats.getFirsts())
+                .add("seconds", stats.getSeconds())
+                .add("thirds", stats.getThirds())
+                .build();
+    }
+
     public void showInfo() {
         System.out.printf("%s. gamesScheduled: %d%n", id, gamesScheduled);
     }
 
-    public ArrayList<ScheduledGame> findMyGames(ArrayList<ScheduledGame> games) {
-        ArrayList<ScheduledGame> myGames = new ArrayList<>();
-        for (ScheduledGame game : games) {
-            if (game.entries.contains(this)) {
+    public ArrayList<ScheduledBattle> findMyGames(ArrayList<ScheduledBattle> games) {
+        ArrayList<ScheduledBattle> myGames = new ArrayList<>();
+        for (ScheduledBattle game : games) {
+            if (game.participants().contains(this)) {
                 myGames.add(game);
             }
         }
         return myGames;
     }
 
-    public HashSet<Entry> findPastOpponents(ArrayList<ScheduledGame> games) {
+    public HashSet<Entry> findPastOpponents(ArrayList<ScheduledBattle> games) {
         HashSet<Entry> pastOpponents = new HashSet<>();
-        for (ScheduledGame game : findMyGames(games)) {
-            for (Entry opponent : game.entries) {
+        for (ScheduledBattle game : findMyGames(games)) {
+            for (Entry opponent : game.participants()) {
                 if (opponent != this) {
                     pastOpponents.add(opponent);
                 }
@@ -390,20 +410,20 @@ class Entry {
         return pastOpponents;
     }
 
-    public void showGames(ArrayList<ScheduledGame> games) {
+    public void showGames(ArrayList<ScheduledBattle> games) {
         System.out.printf("Games with %S%n", id);
-        for (ScheduledGame game : findMyGames(games)) {
+        for (ScheduledBattle game : findMyGames(games)) {
             System.out.println(game.toString());
         }
     }
 
-    public int countCollisions(ArrayList<ScheduledGame> games) {
+    public int countCollisions(ArrayList<ScheduledBattle> games) {
         HashMap<Entry, Integer> opponentsCount = new HashMap<>();
         
         for (Entry opponent : findPastOpponents(games)) {
             opponentsCount.put(opponent, 0);
-            for (ScheduledGame game : findMyGames(games)) {
-                if (game.entries.contains(opponent)) {
+            for (ScheduledBattle game : findMyGames(games)) {
+                if (game.participants().contains(opponent)) {
                     opponentsCount.put(opponent, opponentsCount.get(opponent) + 1);
                 }
             }
@@ -445,5 +465,9 @@ class Entry {
 
     public BattleResults getStats() {
         return stats;
+    }
+
+    public String getDisplayName() {
+        return this.id;
     }
 }

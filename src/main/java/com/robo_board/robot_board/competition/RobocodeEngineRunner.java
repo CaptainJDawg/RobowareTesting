@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -27,22 +28,27 @@ import robocode.BattleResults;
 
 /** One child JVM and its fixed schedule. Static methods coordinate multiple runners. */
 public final class RobocodeEngineRunner {
+    private static boolean PRINT_RUNNER_LOGS = false; // whether or not each runner's terminal output is printed in the main process's terminal
     private static final Path LOG_DIRECTORY = Path.of("logs");
 
     private final int id;
     private final File robocodeHome;
-    private final List<List<String>> schedule;
+    private final List<ScheduledBattle> schedule;
     private Process process;
     private boolean claimed;
     private boolean cancelled;
 
     public RobocodeEngineRunner(int id, File robocodeHome, List<List<String>> schedule) {
-        if (id < 1 || schedule.isEmpty() || schedule.stream().anyMatch(List::isEmpty)) {
+        this(id, robocodeHome, schedule.stream().map(ScheduledBattle::new).toList());
+    }
+
+    public RobocodeEngineRunner(int id, File robocodeHome, Collection<ScheduledBattle> schedule) {
+        if (id < 1 || schedule.isEmpty()) {
             throw new IllegalArgumentException("A runner needs a positive ID and non-empty games");
         }
         this.id = id;
         this.robocodeHome = Objects.requireNonNull(robocodeHome).getAbsoluteFile();
-        this.schedule = schedule.stream().map(List::copyOf).toList();
+        this.schedule = List.copyOf(schedule);
     }
 
     public int getScheduledGameCount() {
@@ -51,12 +57,19 @@ public final class RobocodeEngineRunner {
 
     /** Balanced fixed batches. Never creates a JVM for an empty batch. */
     public static List<List<List<String>>> partitionSchedule(List<List<String>> schedule, int runnerCount) {
+        return partitionSnapshots(schedule.stream().map(List::copyOf).toList(), runnerCount);
+    }
+
+    public static List<List<ScheduledBattle>> partitionBattles(List<ScheduledBattle> schedule, int runnerCount) {
+        return partitionSnapshots(List.copyOf(schedule), runnerCount);
+    }
+
+    private static <T> List<List<T>> partitionSnapshots(List<T> snapshot, int runnerCount) {
         if (runnerCount < 1) {
             throw new IllegalArgumentException("Runner count must be positive");
         }
-        List<List<String>> snapshot = schedule.stream().map(List::copyOf).toList();
         int count = Math.min(runnerCount, snapshot.size());
-        List<List<List<String>>> batches = new ArrayList<>();
+        List<List<T>> batches = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             int start = (int) ((long) snapshot.size() * i / count);
             int end = (int) ((long) snapshot.size() * (i + 1) / count);
@@ -150,12 +163,14 @@ public final class RobocodeEngineRunner {
         Path scheduleFile = Files.createTempFile("robocode-schedule-", ".json");
         try {
             JsonArrayBuilder games = Json.createArrayBuilder();
-            for (List<String> game : schedule) {
-                JsonArrayBuilder robots = Json.createArrayBuilder();
-                game.forEach(robots::add);
-                games.add(robots);
+            for (ScheduledBattle game : schedule) {
+                games.add(game.toJsonObject());
             }
-            Files.writeString(scheduleFile, games.build().toString(), StandardCharsets.UTF_8);
+
+            String scheduleFileContents = games.build().toString();
+            //System.out.printf("Schedule File: %s %n", scheduleFileContents);
+
+            Files.writeString(scheduleFile, scheduleFileContents, StandardCharsets.UTF_8);
             Process child = launch(scheduleFile);
             int completed = 0;
             try (
@@ -180,12 +195,12 @@ public final class RobocodeEngineRunner {
                                 throw new IllegalStateException("Too many battle results from runner " + id);
                             }
                             List<BattleResults> results = decodeResults(response);
-                            if (results.size() != schedule.get(completed - 1).size()) {
+                            if (results.size() != schedule.get(completed - 1).entries().size()) {
                                 throw new IllegalStateException("Incomplete battle result from runner " + id);
                             }
                             events.add(new RunnerEvent(results, null));
                         }
-                    } else {
+                    } else if (PRINT_RUNNER_LOGS) {
                         System.out.printf("[Runner %d] %s%n", id, line);
                     }
                 }
