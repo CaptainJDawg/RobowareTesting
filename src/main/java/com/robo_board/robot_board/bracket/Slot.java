@@ -8,4 +8,16 @@ public class Slot{
         this.slotSource = source;
         this.robotName = null;
     }
+
+    public SlotSources getSlotSource() {
+        return slotSource;
+    }
+
+    public String getRobotName() {
+        return robotName;
+    }
+
+    public void setRobotName(String robotName) {
+        this.robotName = robotName;
+    }
 }

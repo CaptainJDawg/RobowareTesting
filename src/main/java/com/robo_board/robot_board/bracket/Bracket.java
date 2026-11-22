@@ -4,10 +4,12 @@ public class Bracket {
     BracketMatch[] matches;
     int[] seeds;
 
-    public void startMatch() {
+    public void startMatch(int matchId) {
         // Start the first match in the bracket
-        BracketMatch firstMatch = matches[0];
-        firstMatch.matchStatus = MatchStatus.IN_PROGRESS;
+        BracketMatch match = matches[matchId];
+        if (match.matchStatus == MatchStatus.READY) {
+            match.matchStatus = MatchStatus.IN_PROGRESS;
+        }
     }
 
     public void endMatch(BracketMatch match, String winnerRobotName) {
