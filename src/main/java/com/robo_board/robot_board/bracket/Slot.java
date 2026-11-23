@@ -20,4 +20,16 @@ public class Slot{
     public void setRobotName(String robotName) {
         this.robotName = robotName;
     }
+
+    public boolean hasRobot() {
+        return robotName != null;
+    }
+
+    // public void toJSONObject() {
+
+    // }
+
+    // public void fromJSONObject() {
+
+    // }
 }
