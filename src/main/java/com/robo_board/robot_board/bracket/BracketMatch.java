@@ -33,7 +33,7 @@ public class BracketMatch {
         return slot1.hasRobot() && slot2.hasRobot();
     }
 
-    public Boolean hasRobot(String inRobot) {
+    public boolean hasRobot(String inRobot) {
         if (slot1.getRobotName() != null && slot1.getRobotName().equals(inRobot)) {
             return true;
         } else if (slot2.getRobotName() != null && slot2.getRobotName().equals(inRobot)) {
@@ -80,6 +80,22 @@ public class BracketMatch {
 
     public Slot getSlot2() {
         return slot2;
+    }
+
+    public void setMatchStatus(MatchStatus matchStatus) {
+        this.matchStatus = matchStatus;
+    }
+
+    public void setWinner(String winner) {
+        this.winner = winner;
+    }
+
+    public void setLoser(String loser) {
+        this.loser = loser;
+    }
+
+    public boolean isReset() {
+        return isReset;
     }
 
     // public JSON toJsonObject() {
