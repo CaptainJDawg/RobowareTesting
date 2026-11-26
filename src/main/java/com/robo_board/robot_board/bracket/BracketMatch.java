@@ -3,6 +3,7 @@ package com.robo_board.robot_board.bracket;
 
 public class BracketMatch {
     private int matchId;
+    //The side of the bracket the match is on
     private BracketSide matchGroup;
     private int round;
     private MatchStatus matchStatus;
@@ -33,6 +34,7 @@ public class BracketMatch {
         return slot1.hasRobot() && slot2.hasRobot();
     }
 
+    //Checks for a robot in a match
     public boolean hasRobot(String inRobot) {
         if (slot1.getRobotName() != null && slot1.getRobotName().equals(inRobot)) {
             return true;
@@ -42,6 +44,7 @@ public class BracketMatch {
         return false;
     } 
 
+    //Gets the other robots name, so we only need to keep track of the winner in the bracket logic,
     public String otherRobot(String inRobot) {
         if (slot1.getRobotName() != null && slot1.getRobotName().equals(inRobot)) {
             return slot2.getRobotName();

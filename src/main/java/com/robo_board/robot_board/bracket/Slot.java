@@ -1,7 +1,7 @@
 package com.robo_board.robot_board.bracket;
 
 public class Slot{
-    private final SlotSources slotSource;
+    private final SlotSources slotSource; //Shows where the robot is coming from
     private String robotName;  
 
     public Slot(SlotSources source) {

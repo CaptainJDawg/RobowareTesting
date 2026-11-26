@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 public class Bracket {
+    //List of all the matches in the bracket, and the seeds of the robots in the bracket
     List<BracketMatch> matches;
     String[] seeds;
     
@@ -19,13 +20,11 @@ public class Bracket {
     }
 
     public void createBracket() {
-        // Implement the logic to create the bracket based on the seeds
-        // This is a placeholder implementation and should be replaced with actual logic
-        // For example, you can create matches based on the number of seeds and their positions in the bracket
+        //Logic for bracket creation, currently not implemented
     }
 
     private void checkWiring() {
-
+        // Ensure no robot is assigned to multiple slots
         Set<SlotSources> usedSources = new HashSet<>();
         for (BracketMatch match : matches) {
             for (Slot slot : new Slot[]{match.getSlot1(), match.getSlot2()}) {
@@ -80,7 +79,8 @@ public class Bracket {
     }
 
     private void fillSeeds() {
-        // Implement the logic to fill the seeds into the bracket
+        
+        // Fills the bracket with the seeded robots based on their seed numbers
         for (int i = 1; i <= seeds.length; i++) {
             for (BracketMatch match : matches) {
                 if (match.getSlot1().getSlotSource() instanceof SlotSources.Seed seed && seed.seedNumber() == i) {
@@ -94,7 +94,7 @@ public class Bracket {
     }
 
     private void updateReadyMatches() {
-        // Implement the logic to update the status of matches that are ready to be played
+        //Checks if a match has both robots and is not started, then sets it to ready
         for (BracketMatch match : matches) {
             if (match.getSlot1().hasRobot() && match.getSlot2().hasRobot() && match.getMatchStatus() == MatchStatus.NOT_STARTED) {
                 match.setMatchStatus(MatchStatus.READY);
@@ -106,6 +106,7 @@ public class Bracket {
         return matches;
     }
 
+    //Looks for a specific match that holds the ID given
     public BracketMatch findMatchByID(int matchId) {
         for (int i = 0; i < matches.size(); i++) {
             if (matches.get(i).getMatchId() == matchId) {
@@ -115,6 +116,7 @@ public class Bracket {
         return null; // Match not found
     }
 
+    //Moves a match to be in the In Progress state
     public void startMatch(int matchId) {
         //Start match and update the bracket
         BracketMatch match = findMatchByID(matchId);
@@ -126,9 +128,11 @@ public class Bracket {
         }
     }
 
+    //Ends a match, sets the winner and loser, and updates the next match in the bracket
     public void endMatch(int matchId, String winnerRobotName) {
         // End the match and update the bracket
         BracketMatch match = findMatchByID(matchId);
+        //Checks that the winner is in the match given and that the match has been played
         if (match == null) {
             throw new IllegalArgumentException("Match with ID " + matchId + " not found.");
         }
@@ -197,6 +201,7 @@ public class Bracket {
     public String getChampion() {
         // Return the name of the champion robot
         for (BracketMatch match : matches) {
+            //Checks if the match is the grand final or if it was cancelled
             if(match.isReset()) {
                 if(match.getMatchStatus() == MatchStatus.COMPLETED) {
                     return match.getWinner();
